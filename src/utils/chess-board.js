@@ -28,7 +28,7 @@ export function fenToBoard(fen) {
   };
 
   const rows = fen.split(" ")[0].split("/");
-  return rows.map(row => {
+  return rows.map((row) => {
     const boardRow = [];
     for (let char of row) {
       if (isNaN(char)) {
@@ -42,7 +42,7 @@ export function fenToBoard(fen) {
 }
 
 // Determine if it's black's turn based on FEN
-export const isBlackTurn = fen => fen.split(" ")[1] === "b";
+export const isBlackTurn = (fen) => fen.split(" ")[1] === "b";
 
 // Convert algebraic notation to board matrix indices
 export function algebraicToIndex(algebraic) {
@@ -50,4 +50,14 @@ export function algebraicToIndex(algebraic) {
   const col = letterToCol[algebraic[0]];
   const row = 8 - parseInt(algebraic[1]); // Convert to zero-indexed row
   return { row, col };
+}
+
+
+// isKingInCheck.js
+export function isKingInCheck(check, blackTurn, piece) {
+  return (
+    check &&
+    ((blackTurn && piece === "/pieces/bK.svg") ||
+      (!blackTurn && piece === "/pieces/wK.svg") )
+  );
 }
