@@ -1,16 +1,15 @@
-// Mapping index to letters for chessboard columns
-export const indexLetter = {
-  0: "a",
-  1: "b",
-  2: "c",
-  3: "d",
-  4: "e",
-  5: "f",
-  6: "g",
-  7: "h",
-};
+// Letras de las columnas en el tablero
+export const indexLetter = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-// Converts FEN notation to a 2D board array representation
+// Convierte una notación algebraica (como "e2") en índices de fila y columna
+export function algebraicToIndex(algebraic) {
+  return {
+    row: 8 - parseInt(algebraic[1]), // Convierte a índice de fila
+    col: indexLetter.indexOf(algebraic[0]), // Usa indexLetter para obtener la columna
+  };
+}
+
+// Convierte notación FEN a una representación de tablero en 2D con rutas de imagen para cada pieza
 export function fenToBoard(fen) {
   const pieceMap = {
     r: "/pieces/bR.svg",
@@ -27,37 +26,21 @@ export function fenToBoard(fen) {
     P: "/pieces/wP.svg",
   };
 
-  const rows = fen.split(" ")[0].split("/");
-  return rows.map((row) => {
-    const boardRow = [];
-    for (let char of row) {
-      if (isNaN(char)) {
-        boardRow.push(pieceMap[char]); // Add the piece image path
-      } else {
-        boardRow.push(...Array(parseInt(char)).fill(null)); // Fill empty squares
-      }
-    }
-    return boardRow;
-  });
+  // Solo la primera parte del FEN para la disposición del tablero
+  return fen
+    .split(" ")[0]
+    .split("/")
+    .map((row) =>
+      [...row].flatMap((char) =>
+        isNaN(char) ? pieceMap[char] : Array(parseInt(char)).fill(null)
+      )
+    );
 }
 
-// Determine if it's black's turn based on FEN
-export const isBlackTurn = (fen) => fen.split(" ")[1] === "b";
+// Determina si es el turno de las negras según el FEN
+export const isBlackTurn = (fen) => fen.includes(" b ");
 
-// Convert algebraic notation to board matrix indices
-export function algebraicToIndex(algebraic) {
-  const letterToCol = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
-  const col = letterToCol[algebraic[0]];
-  const row = 8 - parseInt(algebraic[1]); // Convert to zero-indexed row
-  return { row, col };
-}
-
-
-// isKingInCheck.js
+// Verifica si el rey del color correspondiente está en jaque
 export function isKingInCheck(check, blackTurn, piece) {
-  return (
-    check &&
-    ((blackTurn && piece === "/pieces/bK.svg") ||
-      (!blackTurn && piece === "/pieces/wK.svg") )
-  );
+  return check && piece === (blackTurn ? "/pieces/bK.svg" : "/pieces/wK.svg");
 }
